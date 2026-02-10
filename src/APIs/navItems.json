@@ -1,0 +1,15 @@
+[
+    {
+        "heading": "Home",
+        "location": "/"
+    },
+    {
+        "heading": "FetchOLD",
+        "location": "/trad"
+    },
+    
+    {
+        "heading": "FetchRQ",
+        "location": "/rq"
+    }
+]
