@@ -1,9 +1,9 @@
-import { deleteItem, getApi } from '../APIs/api';
+import { deletePost, getApi, updatePost } from '../APIs/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import reactLogo from '../assets/react.svg';
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
-import { Trash } from 'lucide-react';
+import { Pencil, Trash } from 'lucide-react';
 
 const FetchRQ = () => {
     const queryClient = useQueryClient();
@@ -12,14 +12,29 @@ const FetchRQ = () => {
     const { data, isPending, isError, error } = useQuery({
         queryKey: ['posts', pageNumber],
         queryFn: () => getApi(pageNumber),
-        refetchInterval:100
+
     });
 
-    const mutation = useMutation({
-        mutationFn: deleteItem,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['posts'] });
-            alert('Deleted successfully!');
+    const deleteMutation = useMutation({
+        mutationFn: (id) => deletePost(id),
+        onSuccess: (data, id) => {
+            queryClient.setQueryData(['posts', pageNumber], (curElem) => {
+                return curElem?.filter((post) => post.id !== id)
+            })
+        }
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: (id) => updatePost(id),
+        onSuccess: (apiData, postId) => {
+
+            queryClient.setQueryData(['posts', pageNumber], (postsData) => {
+                return postsData?.map((curPost) => {
+                    return curPost.id === postId
+                        ? { ...curPost, title: apiData.data.title }
+                        : curPost
+                });
+            });
         },
     });
 
@@ -63,15 +78,24 @@ const FetchRQ = () => {
                                 </h2>
                             </NavLink>
 
-                            {/* ✅ FIXED DELETE BUTTON */}
-                            <button
-                                onClick={() => mutation.mutate(ele.id)}
-                                disabled={mutation.isPending}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
-                                title="Delete Item"
-                            >
-                                <Trash size={18} />
-                            </button>
+
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 ">
+                                <button
+                                    onClick={() => updateMutation.mutate(ele.id)}
+                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                                    title="Update Item"
+                                >
+                                    <Pencil size={18} />
+                                </button>
+                                <button
+                                    onClick={() => deleteMutation.mutate(ele.id)}
+                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                                    title="Delete Item"
+                                >
+                                    <Trash size={18} />
+                                </button>
+                            </div>
+
                         </div>
                     ))}
                 </div>

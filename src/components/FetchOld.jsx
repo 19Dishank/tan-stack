@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getApi } from '../APIs/api';
+import { getApi, oldMathod } from '../APIs/api';
 import reactLogo from '../assets/react.svg'
 
 
@@ -9,7 +9,7 @@ const FetchOld = () => {
     const [isError, setIsError] = useState(null);
     const fetchApi = async () => {
         try {
-            const res = await getApi();
+            const res = await oldMathod();
             res.status === 200 ? setData(res.data) : [];
             setLoading(false);
         } catch (error) {
@@ -23,7 +23,6 @@ const FetchOld = () => {
     useEffect(() => {
         fetchApi();
     }, []);
-
 
     if (loading) return <div className='text-6xl h-lvh flex justify-center items-center'><img src={reactLogo} alt="Loading" className='h-50 animate-spin'/></div>
 
