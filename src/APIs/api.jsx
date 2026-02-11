@@ -4,6 +4,10 @@ const api = axios.create({
     baseURL: "https://jsonplaceholder.typicode.com/"
 })
 
+export const oldMathod = () => {
+    return api.get('/posts');
+}
+
 export const getApi = async (pageNumber) => {
     try {
         const res = await api.get(`/posts?_start=${pageNumber}&_limit=16`)
@@ -23,12 +27,11 @@ export const getIndvData = async (id) => {
     }
 }
 
-export const deleteItem = async (id) => {
-    const res = await api.delete(`posts/${id}`);
+export const deletePost = (id) => {
+    return api.delete(`/posts/${id}`)
+}
 
-    if (res.status === 200) {
-        return res.data;
-    }
 
-    throw new Error("Failed to delete item");
-};
+export const updatePost = (id) => {
+    return api.patch(`/posts/${id}`, { title: "I have Updated" })
+}
